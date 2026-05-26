@@ -33,9 +33,10 @@ const start = async () => {
     await sequelize.authenticate();
     console.log('✅ Database connected');
 
-    // Sync models (use migrations in production)
-    await sequelize.sync({ alter: true });
-    console.log('✅ Models synced');
+    if (process.env.NODE_ENV !== 'production') {
+      await sequelize.sync({ alter: true });
+      console.log('✅ Models synced');
+    }
 
     app.listen(PORT, () => console.log(`✅ Server running on http://localhost:${PORT}`));
   } catch (err) {

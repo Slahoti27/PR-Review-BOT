@@ -2,13 +2,18 @@ const passport = require('passport');
 const GitHubStrategy = require('passport-github2').Strategy;
 const User = require('../models/User');
 
+const githubScopes = (process.env.GITHUB_SCOPES || 'user:email,public_repo')
+  .split(',')
+  .map((scope) => scope.trim())
+  .filter(Boolean);
+
 passport.use(
   new GitHubStrategy(
     {
       clientID: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
       callbackURL: process.env.GITHUB_CALLBACK_URL,
-      scope: ['user:email', 'repo'],  // repo scope needed to post PR comments
+      scope: githubScopes,
     },
     async (accessToken, refreshToken, profile, done) => {
       try {

@@ -1,6 +1,6 @@
 const Review = require('../models/Review');
 const { parsePrUrl, getPrDetails, getPrFiles, postPrReview, postSummaryComment } = require('../services/githubService');
-const { reviewWithClaude, buildSummaryMarkdown } = require('../services/claudeService');
+const { reviewWithGemini, buildSummaryMarkdown } = require('../services/geminiService');
 
 const getErrorMessage = (err) => err.response?.data?.message
   || err.response?.data?.error?.message
@@ -52,8 +52,8 @@ const runReview = async (review, token, owner, repo, prNumber) => {
 
   await review.update({ prTitle: prDetails.title });
 
-  // Send diff to Claude
-  const issues = await reviewWithClaude(files);
+  // Send diff to the configured AI provider
+  const issues = await reviewWithGemini(files);
 
   // Count severities
   const criticalCount = issues.filter((i) => i.severity === 'critical').length;
@@ -67,10 +67,8 @@ const runReview = async (review, token, owner, repo, prNumber) => {
     majorCount,
     minorCount,
     prTitle: prDetails.title,
+    headSha: prDetails.head,
   });
-
-  // Store commit sha for later use when posting to GitHub
-  review.headSha = prDetails.head;
 };
 
 // GET /api/reviews — list current user's reviews

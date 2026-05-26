@@ -94,7 +94,7 @@ const reviewWithAnthropic = async (prompt) => {
   return response.data.content?.[0]?.text?.trim() || '';
 };
 
-const reviewWithGemini = async (prompt) => {
+const callGemini = async (prompt) => {
   if (!process.env.GEMINI_API_KEY) {
     throw new Error('GEMINI_API_KEY is not configured');
   }
@@ -206,8 +206,7 @@ const parseIssues = (rawText) => {
 };
 
 // Call the configured AI provider and parse the JSON response.
-// Kept as reviewWithClaude so the controller import does not need to change.
-const reviewWithClaude = async (files) => {
+const reviewWithGemini = async (files) => {
   const prompt = buildPrompt(files);
   const provider = (process.env.AI_PROVIDER || '').toLowerCase();
 
@@ -215,7 +214,7 @@ const reviewWithClaude = async (files) => {
     || (!provider && process.env.GEMINI_API_KEY);
 
   const rawText = useGemini
-    ? await reviewWithGemini(prompt)
+    ? await callGemini(prompt)
     : await reviewWithAnthropic(prompt);
 
   return parseIssues(rawText);
@@ -262,4 +261,4 @@ const buildSummaryMarkdown = (issues, prTitle) => {
   return md;
 };
 
-module.exports = { reviewWithClaude, buildSummaryMarkdown };
+module.exports = { reviewWithGemini, buildSummaryMarkdown };

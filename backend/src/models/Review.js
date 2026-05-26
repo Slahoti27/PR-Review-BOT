@@ -10,9 +10,10 @@ const Review = sequelize.define('Review', {
   repoName: { type: DataTypes.STRING, allowNull: false },
   prNumber: { type: DataTypes.INTEGER, allowNull: false },
   prTitle: { type: DataTypes.TEXT },
+  headSha: { type: DataTypes.STRING },
   status: { type: DataTypes.ENUM('pending', 'completed', 'failed'), defaultValue: 'pending' },
   failureReason: { type: DataTypes.TEXT },
-  // Stores full Claude response as JSON array of issues
+  // Stores full AI response as JSON array of issues
   reviewData: { type: DataTypes.JSONB },
   // Summary counts
   criticalCount: { type: DataTypes.INTEGER, defaultValue: 0 },
