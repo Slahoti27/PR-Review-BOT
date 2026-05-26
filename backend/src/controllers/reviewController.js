@@ -2,6 +2,12 @@ const Review = require('../models/Review');
 const { parsePrUrl, getPrDetails, getPrFiles, postPrReview, postSummaryComment } = require('../services/githubService');
 const { reviewWithClaude, buildSummaryMarkdown } = require('../services/claudeService');
 
+const getErrorMessage = (err) => err.response?.data?.message
+  || err.response?.data?.error?.message
+  || err.response?.data?.error
+  || err.message
+  || 'Unknown error';
+
 // POST /api/reviews — trigger a new AI review
 const createReview = async (req, res) => {
   const { prUrl } = req.body;
@@ -28,8 +34,9 @@ const createReview = async (req, res) => {
 
   // Run the review async (don't await — return immediately)
   runReview(review, req.user.githubAccessToken, owner, repo, prNumber).catch((err) => {
-    console.error('Review failed:', err.message);
-    review.update({ status: 'failed' });
+    const failureReason = getErrorMessage(err);
+    console.error('Review failed:', failureReason);
+    review.update({ status: 'failed', failureReason });
   });
 
   res.status(202).json({ id: review.id, status: 'pending', message: 'Review started' });
@@ -73,7 +80,7 @@ const getReviews = async (req, res) => {
     order: [['createdAt', 'DESC']],
     attributes: ['id', 'prUrl', 'prTitle', 'repoOwner', 'repoName', 'prNumber',
       'status', 'criticalCount', 'majorCount', 'minorCount', 'postedToGithub',
-      'shareToken', 'createdAt'],
+      'failureReason', 'shareToken', 'createdAt'],
   });
   res.json(reviews);
 };

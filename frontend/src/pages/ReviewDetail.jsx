@@ -130,7 +130,9 @@ export default function ReviewDetail() {
           </div>
         )}
         {review.status === 'failed' && (
-          <div style={{ marginTop: '1rem', color: 'var(--critical)', fontSize: 14 }}>❌ Review failed. Please try again.</div>
+          <div style={{ marginTop: '1rem', color: 'var(--critical)', fontSize: 14 }}>
+            ❌ Review failed{review.failureReason ? `: ${review.failureReason}` : '. Please try again.'}
+          </div>
         )}
       </div>
 

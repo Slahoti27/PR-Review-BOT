@@ -11,6 +11,7 @@ const Review = sequelize.define('Review', {
   prNumber: { type: DataTypes.INTEGER, allowNull: false },
   prTitle: { type: DataTypes.TEXT },
   status: { type: DataTypes.ENUM('pending', 'completed', 'failed'), defaultValue: 'pending' },
+  failureReason: { type: DataTypes.TEXT },
   // Stores full Claude response as JSON array of issues
   reviewData: { type: DataTypes.JSONB },
   // Summary counts
